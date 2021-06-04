@@ -145,8 +145,9 @@ def start_download_server(file_path: str, **kwargs):
         no_force_download (bool): Allow web browser to handle the file served
             instead of forcing the browser to download it.
     """
-    PORT = int(kwargs.get("custom_port", random.randint(1024, 65535)))
-    LOCAL_IP = kwargs.get("ip_addr", get_local_ip())
+    # kwargs里有custom_port，只不过值为None，不能用.get(xx,xx)，那样就取到None了
+    PORT = int(kwargs["custom_port"]) if kwargs.get("custom_port") else random.randint(1024, 65535)
+    LOCAL_IP = kwargs["ip_addr"] if kwargs["ip_addr"] else get_local_ip()
 
     if not os.path.exists(file_path):
         print("No such file or directory")
