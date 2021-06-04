@@ -216,9 +216,6 @@ def main():
 
     args = parser.parse_args()
 
-    if not (is_supported_env() or args.debug): # 要么真的支持，要么开启debug
-        raise NotImplementedError
-
     # We are disabling the cursor so that the output looks cleaner
     cursor(False)
 
