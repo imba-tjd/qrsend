@@ -8,6 +8,7 @@ import sys
 from shutil import make_archive
 import argparse
 import qrcode
+from urllib.parse import quote
 
 
 def is_supported_env():
@@ -172,7 +173,8 @@ def start_download_server(file_path: str, **kwargs):
             clean_exit()
 
     # Tweaking file_name to make a perfect url
-    file_name = file_name.replace(" ", "%20")
+    # file_name = file_name.replace(" ", "%20")
+    file_name = quote(file_name)
 
     handler = getFileTransferServerHandler(
         file_name,
@@ -229,6 +231,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    # start_download_server('readme.md')
-    start_download_server('.vscode')
+    main()
+    # start_download_server('readme.md', custom_port=8000)
