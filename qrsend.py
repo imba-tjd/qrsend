@@ -9,6 +9,7 @@ from shutil import make_archive
 import argparse
 import qrcode
 from urllib.parse import quote
+import atexit
 
 
 def is_supported_env():
@@ -28,7 +29,7 @@ def cursor(status: bool):
         print("\033[?25" + ("h" if status else "l"), end="")
 
 
-def clean_exit():
+def clean_before_exit():
     """
     These are some things that need to be done before exiting so that the user
     does have any problems after they have run qr-filetransfer
@@ -43,8 +44,6 @@ def clean_exit():
     # ...and printing "nothing" over it to hide ^C when
     # CTRL+C is pressed
     print("  ")
-
-    sys.exit()
 
 
 def getFileTransferServerHandler(file_name, debug=False, force_download=True):
@@ -102,7 +101,7 @@ def get_local_ip():
             return s.getsockname()[0]
     except OSError:
         print("Network is unreachable")
-        clean_exit()
+        sys.exit(1)
 
 
 def get_local_ips_available():
@@ -151,10 +150,9 @@ def start_download_server(file_path: str, **kwargs):
 
     if not os.path.exists(file_path):
         print("No such file or directory")
-        clean_exit()
+        sys.exit(1)
 
     # Variable to mark zip for deletion, if the user uses a folder as an argument
-    delete_zip = None
     abs_path = os.path.normpath(os.path.abspath(file_path))
     file_dir = os.path.dirname(abs_path)
     file_name = os.path.basename(abs_path)
@@ -168,10 +166,10 @@ def start_download_server(file_path: str, **kwargs):
             # Zips the directory
             path_to_zip = make_archive(file_name, "zip", file_name)
             file_name = os.path.basename(path_to_zip)
-            delete_zip = file_name
+            atexit.register(lambda: os.remove(file_name))
         except PermissionError:
             print("Permission denied")
-            clean_exit()
+            sys.exit(1)
 
     # Tweaking file_name to make a perfect url
     # file_name = file_name.replace(" ", "%20")
@@ -195,12 +193,7 @@ def start_download_server(file_path: str, **kwargs):
     except KeyboardInterrupt:
         httpd.server_close()
 
-    # If the user sent a directory, a zip was created
-    # this deletes the first created zip
-    if delete_zip:
-        os.remove(delete_zip)
-
-    clean_exit()
+    sys.exit()
 
 
 def main():
@@ -218,6 +211,7 @@ def main():
 
     # We are disabling the cursor so that the output looks cleaner
     cursor(False)
+    atexit.register(clean_before_exit)
 
     start_download_server(
         args.file_path,
@@ -230,4 +224,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # start_download_server('readme.md', custom_port=8000)
+    # start_download_server('.venv', custom_port=8000)
