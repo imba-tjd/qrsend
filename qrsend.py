@@ -166,7 +166,7 @@ def start_download_server(file_path: str, **kwargs):
             # Zips the directory
             path_to_zip = make_archive(file_name, "zip", file_name)
             file_name = os.path.basename(path_to_zip)
-            atexit.register(lambda: os.remove(file_name))
+            atexit.register(lambda x: os.remove(x), file_name)
         except PermissionError:
             print("Permission denied")
             sys.exit(1)
