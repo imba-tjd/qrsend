@@ -10,6 +10,7 @@ import argparse
 import qrcode
 from urllib.parse import quote
 import atexit
+import zipfile
 
 
 def is_supported_env():
@@ -66,7 +67,7 @@ class FileTransferServerHandler(SimpleHTTPRequestHandler):
         else:
             try:
                 super().do_GET()
-            except ConnectionResetError:
+            except (ConnectionResetError, ConnectionAbortedError):
                 pass
 
     def do_HEAD(self):
@@ -198,7 +199,6 @@ def start_download_server(file_path: str, **kwargs):
 
 def main():
     parser = argparse.ArgumentParser()
-
     parser.add_argument('file_path', help="path that you want to transfer.")
     parser.add_argument('--debug', '-d', action="store_true", default=False, help="show the encoded url.")
     parser.add_argument('--port', dest="port", help="use a custom port")
@@ -206,12 +206,13 @@ def main():
     parser.add_argument("--no-force-download", '--nfd', default=False, action="store_true",
         help="Allow browser to handle the file processing instead of forcing it to download."
     )
-
     args = parser.parse_args()
 
     # We are disabling the cursor so that the output looks cleaner
     cursor(False)
     atexit.register(clean_before_exit)
+
+    zipfile.ZIP_DEFLATED = zipfile.ZIP_STORED # shutil.make_archive()默认会用DEFLATED算法，不需要
 
     start_download_server(
         args.file_path,
