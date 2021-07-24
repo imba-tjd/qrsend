@@ -212,7 +212,9 @@ def main():
     cursor(False)
     atexit.register(clean_before_exit)
 
-    zipfile.ZIP_DEFLATED = zipfile.ZIP_STORED # shutil.make_archive()默认会用DEFLATED算法，不需要
+    # shutil.make_archive()默认会用DEFLATED算法，不需要
+    zipfileinit = zipfile.ZipFile.__init__
+    zipfile.ZipFile.__init__ = lambda *args, **kwargs: zipfileinit(*args, **kwargs | {'compression': zipfile.ZIP_STORED})
 
     start_download_server(
         args.file_path,
