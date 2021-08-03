@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='qrsend',
-    version='2.6.3',
+    version='2.6.4',
     py_modules=['qrsend'],
     entry_points={'console_scripts': ['qrsend = qrsend:main']},
     install_requires=['qrcode'],

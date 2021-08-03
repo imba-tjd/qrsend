@@ -47,23 +47,15 @@ def clean_before_exit():
     print("  ")
 
 
-def getFileTransferServerHandler(file_name, debug=False, force_download=True):
-    clazz = FileTransferServerHandler
-    clazz.file_name = file_name
-    clazz.debug = debug
-    clazz.force_download = force_download
-    return clazz
-
 class FileTransferServerHandler(SimpleHTTPRequestHandler):
     file_name: str
-    debug: bool
-    force_download: bool
+    debug: bool = False
+    force_download: bool = True
 
     def do_GET(self):
         # the self.path will start by '/', we truncate it.
         if self.path[1:] != self.file_name:
-            # access denied
-            self.send_error(403)
+            self.send_error(403) # access denied
         else:
             try:
                 super().do_GET()
@@ -93,6 +85,15 @@ class FileTransferServerHandler(SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         if self.debug:
             super().log_message(format, *args)
+
+    @staticmethod
+    def create(file_name, debug=False, force_download=True):
+        # 类的__dict__无法赋值或update；super的init又是严格的，不允许含有未知的kwargs
+        clazz = FileTransferServerHandler
+        clazz.file_name = file_name
+        clazz.debug = debug
+        clazz.force_download = force_download
+        return clazz
 
 
 def get_local_ip():
@@ -176,7 +177,7 @@ def start_download_server(file_path: str, **kwargs):
     # file_name = file_name.replace(" ", "%20")
     file_name = quote(file_name)
 
-    handler = getFileTransferServerHandler(
+    handler = FileTransferServerHandler.create(
         file_name,
         debug=kwargs.get('debug', False),
         force_download=not kwargs.get("no_force_download", False)
