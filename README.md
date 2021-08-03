@@ -1,26 +1,25 @@
 # QR Send
 
-This is a fork of https://github.com/sdushantha/qr-filetransfer, based on 47e170e.
+This is a fork of https://github.com/sdushantha/qr-filetransfer.
 
 * I don't need upload and auth
 * I want a shorter exe name
 * I want a smaller QR code pattern
-* No need to use DEFLATED when making archives which is inefficient
-
-I changed the code's filename so it makes no sense to keep upstream's commit history.
+* I don't need DEFLATED when making archives because it's inefficient
+* I changed the code's filename so it makes no sense to keep upstream's commit history
 
 ## Usage
 
 ```cmd
 pip install git+https://github.com/imba-tjd/qrsend  # pipx is preferred
-qrsend file.txt
+qrsend file.txt/folder
 ```
 
 ## Won't fix
 
 * Only one connection at a time when downlaoding
-* In memory zip. The logic difference is too large. http.server works by reading local files
-* Accept-Ranges: bytes。http.server isn't support yet，see https://bugs.python.org/issue42643
+* In memory zip. The logic difference is too large. http.server works by reading local files. And according to the docs, ZipFile only accept path-like-obj now rather than file-like-obj in Py2, let alone make_archive.
+* Accept-Ranges: bytes. http.server doesn't support yet，see https://bugs.python.org/issue42643
 
 ## TODO
 
