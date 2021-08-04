@@ -217,7 +217,8 @@ def main():
 
     # shutil.make_archive()默认会用DEFLATED算法，不需要
     zipfileinit = zipfile.ZipFile.__init__
-    zipfile.ZipFile.__init__ = lambda *args, **kwargs: zipfileinit(*args, **kwargs | {'compression': zipfile.ZIP_STORED})
+    def zipfileinit_stub(*args, **kwargs): zipfileinit(*args, **kwargs | {'compression': zipfile.ZIP_STORED})
+    zipfile.ZipFile.__init__ = zipfileinit_stub
 
     start_download_server(
         args.file_path,
