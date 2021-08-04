@@ -11,6 +11,7 @@ import qrcode
 from urllib.parse import quote
 import atexit
 import zipfile
+import tempfile
 
 
 def is_supported_env():
@@ -165,8 +166,9 @@ def start_download_server(file_path: str, **kwargs):
     # Checking if given file name or path is a directory
     if os.path.isdir(file_name):
         try:
-            # Zips the directory
-            path_to_zip = make_archive(file_name, "zip", file_name)
+            # Zips the directory to tempdir
+            os.chdir(tempfile.gettempdir())
+            path_to_zip = make_archive(file_name, "zip", abs_path)
             file_name = os.path.basename(path_to_zip)
             atexit.register(lambda x: os.remove(x), file_name)
         except PermissionError:
