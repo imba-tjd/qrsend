@@ -18,6 +18,6 @@ qrsend file.txt/folder
 
 ## Won't fix
 
-* Only one connection at a time when downlaoding
+* Only one connection at a time when downlaoding. Tried using threading but failed.
 * In memory zip. The logic difference is too large. http.server works by reading local files. And according to the docs, ZipFile only accept path-like-obj now rather than file-like-obj in Py2, let alone make_archive.
 * Accept-Ranges: bytes. http.server doesn't support yet，see https://bugs.python.org/issue42643
