@@ -203,10 +203,10 @@ def start_download_server(file_path: str, **kwargs):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('file_path', help="path that you want to transfer.")
-    parser.add_argument('--debug', '-d', action="store_true", default=False, help="show the encoded url.")
-    parser.add_argument('--port', '-p', dest="port", help="use a custom port")
-    parser.add_argument('--ip_addr', dest="ip_addr", choices=get_local_ips_available(), help="specify IP address")
-    parser.add_argument("--no-force-download", '--nfd', default=False, action="store_true",
+    parser.add_argument('--debug', '-d', action="store_true", help="show the encoded url.")
+    parser.add_argument('--port', '-p', help="use a custom port")
+    parser.add_argument('--ip_addr', choices=get_local_ips_available(), help="specify IP address")
+    parser.add_argument("--no-force-download", '--nfd', action="store_true",
         help="Allow browser to handle the file processing instead of forcing it to download."
     )
     args = parser.parse_args()
