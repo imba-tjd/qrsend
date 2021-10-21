@@ -192,10 +192,11 @@ def start_download_server(file_path: str, **kwargs):
     print(address)
     print_qr_code(address)
 
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        httpd.server_close()
+    with httpd:
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            httpd.server_close()
 
     sys.exit()
 
