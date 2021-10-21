@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import random
 import os
 import socket
@@ -184,7 +184,7 @@ def start_download_server(file_path: str, **kwargs):
         debug=kwargs.get('debug', False),
         force_download=not kwargs.get("no_force_download", False)
     )
-    httpd = HTTPServer(("", PORT), handler)
+    httpd = ThreadingHTTPServer(("", PORT), handler)
 
     # This is the url to be encoded into the QR code
     address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + file_name
