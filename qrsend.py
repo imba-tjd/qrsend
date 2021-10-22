@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import random
 import os
@@ -7,11 +5,11 @@ import socket
 import sys
 from shutil import make_archive
 import argparse
-import qrcode
 from urllib.parse import quote
 import atexit
 import zipfile
 import tempfile
+import qrcode
 
 
 def is_supported_env():
@@ -170,7 +168,7 @@ def start_download_server(file_path: str, **kwargs):
             os.chdir(tempfile.gettempdir())
             path_to_zip = make_archive(file_name, "zip", abs_path)
             file_name = os.path.basename(path_to_zip)
-            atexit.register(lambda x: os.remove(x), file_name)
+            atexit.register(os.remove, file_name)
         except PermissionError:
             print("Permission denied")
             sys.exit(1)
@@ -232,4 +230,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # start_download_server('.venv', custom_port=8000)
