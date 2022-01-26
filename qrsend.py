@@ -199,6 +199,12 @@ def start_download_server(file_path: str, **kwargs):
     sys.exit()
 
 
+def create_sendto():
+    '''Add qrsend.bat to *SendTo* context menu'''
+    with open(os.path.expandvars('%AppData%') + '\\Microsoft\\Windows\\SendTo\\qrsend.bat', 'x') as f:
+        f.write('@echo off\nqrsend %*')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('file_path', help="path that you want to transfer.")
