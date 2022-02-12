@@ -225,6 +225,9 @@ def main():
     def zipfileinit_stub(*args, **kwargs): zipfileinit(*args, **kwargs | {'compression': zipfile.ZIP_STORED})
     zipfile.ZipFile.__init__ = zipfileinit_stub
 
+    import http_server_range_patch
+    http_server_range_patch.patch()
+
     start_download_server(
         args.file_path,
         debug=args.debug,
