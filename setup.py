@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='qrsend',
-    version='2.6.11',
+    version='2.6.12',
     py_modules=['qrsend', 'http_server_range_patch'],
     entry_points={'console_scripts': ['qrsend = qrsend:main']},
     install_requires=['qrcode'],

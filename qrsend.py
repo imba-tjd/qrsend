@@ -173,6 +173,8 @@ def start_download_server(file_path: str, **kwargs):
             print("Permission denied")
             sys.exit(1)
 
+    _ = open(file_name, 'rb') # 加读锁，防止没有正在下载时能删除文件
+
     # Tweaking file_name to make a perfect url
     # file_name = file_name.replace(" ", "%20")
     file_name = quote(file_name)
