@@ -117,7 +117,7 @@ def send_head(self):
                 f.close()
                 return None
             self.send_response(HTTPStatus.PARTIAL_CONTENT)
-            self.send_header("Content-Range", f"{self.headers['Range']}/{fs[6]}")
+            self.send_header("Content-Range", f"{self.headers['Range']}/{fs[6]}".replace('-/', f'-{fs[6]-1}/'))
             self.send_header("Content-Length", (int(res.group("last")) if res.group("last") else fs[6])-int(res.group("first")))
         else:
             self.send_response(HTTPStatus.OK)
