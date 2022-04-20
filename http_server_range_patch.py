@@ -22,12 +22,12 @@ HTTP_BYTES_RANGE_HEADER = re.compile(r"bytes=(?P<first>\d+)-(?P<last>\d+)?$")
 
 def do_GET(self):
     """Serve a GET request."""
-    f = self.send_head()
-    if f:
+    if f := self.send_head():
         try:
             if "Range" in self.headers:
-                res = HTTP_BYTES_RANGE_HEADER.match(string=self.headers.get("Range"))
-                if res:
+                if res := HTTP_BYTES_RANGE_HEADER.match(
+                    string=self.headers.get("Range")
+                ):
                     self.copyfile(f, self.wfile, int(res.group("first")), int(res.group("last")) if res.group("last") else -1)
             else:
                 self.copyfile(f, self.wfile)
@@ -50,8 +50,7 @@ def send_head(self):
         if not parts.path.endswith('/'):
             # redirect browser - doing basically what apache does
             self.send_response(HTTPStatus.MOVED_PERMANENTLY)
-            new_parts = (parts[0], parts[1], parts[2] + '/',
-                            parts[3], parts[4])
+            new_parts = parts[0], parts[1], f'{parts[2]}/', parts[3], parts[4]
             new_url = urllib.parse.urlunsplit(new_parts)
             self.send_header("Location", new_url)
             self.send_header("Content-Length", "0")
