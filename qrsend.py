@@ -187,7 +187,7 @@ def start_download_server(file_path: str, **kwargs):
     httpd = ThreadingHTTPServer(("", PORT), handler)
 
     # This is the url to be encoded into the QR code
-    address = "http://" + str(LOCAL_IP) + ":" + str(PORT) + "/" + file_name
+    address = f"http://{str(LOCAL_IP)}:{str(PORT)}/{file_name}"
 
     print(address)
     print_qr_code(address)
