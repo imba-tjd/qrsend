@@ -28,7 +28,7 @@ def do_GET(self):
             if "Range" in self.headers:
                 res = HTTP_BYTES_RANGE_HEADER.match(string=self.headers.get("Range"))
                 if res:
-                    self.copyfile(f, self.wfile, int(res.group("first")), int(res.group("last")) if res.group("last") else -1)
+                    self.copyfile(f, self.wfile, int(res.group("first")), int(res.group("last"))+1 if res.group("last") else None)
             else:
                 self.copyfile(f, self.wfile)
         finally:
@@ -118,7 +118,7 @@ def send_head(self):
                 return None
             self.send_response(HTTPStatus.PARTIAL_CONTENT)
             self.send_header("Content-Range", f"{self.headers['Range']}/{fs[6]}".replace('-/', f'-{fs[6]-1}/'))
-            self.send_header("Content-Length", (int(res.group("last")) if res.group("last") else fs[6])-int(res.group("first")))
+            self.send_header("Content-Length", (int(res.group("last"))+1 if res.group("last") else fs[6])-int(res.group("first")))
         else:
             self.send_response(HTTPStatus.OK)
             self.send_header("Accept-Ranges", "bytes")
@@ -134,8 +134,8 @@ def send_head(self):
 
 
 def copyfile(self, source, outputfile, start_byte=None, end_byte=None):
-    if start_byte and end_byte:
+    if start_byte:
         source.seek(start_byte)
-        outputfile.write(source.read(end_byte))
+        outputfile.write(source.read(-1 if not end_byte else end_byte-start_byte))
     else:
         shutil.copyfileobj(source, outputfile)
