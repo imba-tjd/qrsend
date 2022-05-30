@@ -22,3 +22,7 @@ qrsend file.txt/folder
 ## Won't fix
 
 * In memory zip. The logic difference is too large. http.server works by reading local files. And according to the docs, ZipFile only accept path-like-obj now rather than file-like-obj in Py2, let alone make_archive.
+
+## TODO
+
+* In order to fix high resources consumption when resuming from large files, I ignored `end_byte` and let the client to guarantee not to excessive read. I have tested that curl and FF works. I tried to use `source.truncate()` but it turns out an `io.UnsupportedOperation`. A better way needs to be find in the future.

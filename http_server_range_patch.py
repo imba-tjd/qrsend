@@ -136,6 +136,8 @@ def send_head(self):
 def copyfile(self, source, outputfile, start_byte=None, end_byte=None):
     if start_byte:
         source.seek(start_byte)
-        outputfile.write(source.read(-1 if not end_byte else end_byte-start_byte))
-    else:
-        shutil.copyfileobj(source, outputfile)
+    # if end_byte:
+    #     source.truncate(end_byte-start_byte)
+    #     outputfile.write(source.read(-1 if not end_byte else end_byte-start_byte))
+    # else:
+    shutil.copyfileobj(source, outputfile)
