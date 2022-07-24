@@ -28,9 +28,11 @@ def do_GET(self):
             if "Range" in self.headers:
                 res = HTTP_BYTES_RANGE_HEADER.match(string=self.headers.get("Range"))
                 if res:
-                    self.copyfile(f, self.wfile, int(res.group("first")), int(res.group("last"))+1 if res.group("last") else None)
+                    # self.copyfile(f, self.wfile, int(res.group("first")), int(res.group("last"))+1 if res.group("last") else None)
+                    self.wfile._sock.sendfile(f, int(res.group("first")), int(res["last"])+1 if res["last"] else None)
             else:
-                self.copyfile(f, self.wfile)
+                # self.copyfile(f, self.wfile)
+                self.wfile._sock.sendfile(f)
         finally:
             f.close()
 

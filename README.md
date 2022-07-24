@@ -25,4 +25,4 @@ qrsend file.txt/folder
 
 ## TODO
 
-* In order to fix high resources consumption when resuming from large files, I ignored `end_byte` and let the client to guarantee not to excessive read. I have tested that curl and FF works. I tried to use `source.truncate()` but it turns out an `io.UnsupportedOperation`. A better way needs to be find in the future.
+* In order to fix high resources consumption when resuming from large files, ~~I ignored `end_byte` and let the client to guarantee not to excessive read. I have tested that curl and FF works. I tried to use `source.truncate()` but it turns out an `io.UnsupportedOperation`. A better way needs to be find in the future.~~ I have found that `wfile._sock.sendfile()` is the perfect solution, except `_sock` isn't public
