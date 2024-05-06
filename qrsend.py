@@ -1,5 +1,4 @@
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-import random
 import os
 import socket
 import sys
@@ -146,7 +145,7 @@ def start_download_server(file_path: str, **kwargs):
             instead of forcing the browser to download it.
     """
     # kwargs里有custom_port，只不过值为None，不能用.get(xx,xx)，那样就取到None了
-    PORT = int(kwargs["custom_port"]) if kwargs.get("custom_port") else random.randint(1024, 65535)
+    PORT = int(kwargs["custom_port"]) if kwargs.get("custom_port") else 0
     LOCAL_IP = kwargs.get("ip_addr") or get_local_ip()
 
     if not os.path.exists(file_path):
@@ -187,7 +186,7 @@ def start_download_server(file_path: str, **kwargs):
     httpd = ThreadingHTTPServer(("", PORT), handler)
 
     # This is the url to be encoded into the QR code
-    address = f"http://{str(LOCAL_IP)}:{str(PORT)}/{file_name}"
+    address = f"http://{str(LOCAL_IP)}:{str(httpd.server_port)}/{file_name}"
 
     print(address)
     print_qr_code(address)
@@ -196,7 +195,7 @@ def start_download_server(file_path: str, **kwargs):
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
-            httpd.server_close()
+            pass
 
     sys.exit()
 
