@@ -55,10 +55,7 @@ class FileTransferServerHandler(SimpleHTTPRequestHandler):
         if self.path[1:] != self.file_name:
             self.send_error(403) # access denied
         else:
-            try:
-                super().do_GET()
-            except (ConnectionResetError, ConnectionAbortedError):
-                pass
+            super().do_GET()
 
     def do_HEAD(self):
         if self.path[1:] != self.file_name:
@@ -79,6 +76,12 @@ class FileTransferServerHandler(SimpleHTTPRequestHandler):
             return "application/octet-stream"
 
         return super().guess_type(path)
+
+    def handle_one_request(self):
+        try:
+            super().handle_one_request()
+        except (ConnectionResetError, ConnectionAbortedError):
+            pass
 
     def log_message(self, format, *args):
         if self.debug:
