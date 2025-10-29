@@ -206,7 +206,7 @@ def start_download_server(file_path: str, **kwargs):
 def create_sendto():
     '''Add qrsend.bat to *SendTo* context menu'''
     with open(os.path.expandvars('%AppData%') + '\\Microsoft\\Windows\\SendTo\\qrsend.bat', 'x') as f:
-        f.write('@echo off\nqrsend %*')
+        f.write('@echo off\npython -m qrsend %*')
 
 
 def main():
