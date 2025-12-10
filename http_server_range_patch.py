@@ -7,6 +7,11 @@ import http.server
 del http.server.__all__
 from http.server import *
 
+__TYPE_CHECK_ = False
+if __TYPE_CHECK_:
+    import os, datetime, urllib.parse, email.utils, io, socket
+    from http import HTTPStatus
+
 __all__ = ['patch']
 
 def patch():
@@ -20,24 +25,22 @@ import re
 HTTP_BYTES_RANGE_HEADER = re.compile(r"bytes=(?P<first>\d+)-(?P<last>\d+)?$")
 
 
-def do_GET(self):
+def do_GET(self: SimpleHTTPRequestHandler):
     """Serve a GET request."""
     f = self.send_head()
     if f:
         try:
             if "Range" in self.headers:
-                res = HTTP_BYTES_RANGE_HEADER.match(string=self.headers.get("Range"))
+                res = HTTP_BYTES_RANGE_HEADER.match(self.headers["Range"])
                 if res:
-                    # self.copyfile(f, self.wfile, int(res.group("first")), int(res.group("last"))+1 if res.group("last") else None)
-                    self.wfile._sock.sendfile(f, int(res.group("first")), int(res["last"])+1 if res["last"] else None)
+                    self.copyfile(f, self.wfile, int(res["first"]), int(res["last"])+1 if res["last"] else None)
             else:
-                # self.copyfile(f, self.wfile)
-                self.wfile._sock.sendfile(f)
+                self.copyfile(f, self.wfile)
         finally:
             f.close()
 
 
-def send_head(self):
+def send_head(self: SimpleHTTPRequestHandler):
     """Common code for GET and HEAD commands.
     This sends the response code and MIME headers.
     Return value is either a file object (which has to be copied
@@ -120,7 +123,7 @@ def send_head(self):
                 return None
             self.send_response(HTTPStatus.PARTIAL_CONTENT)
             self.send_header("Content-Range", f"{self.headers['Range']}/{fs[6]}".replace('-/', f'-{fs[6]-1}/'))
-            self.send_header("Content-Length", (int(res.group("last"))+1 if res.group("last") else fs[6])-int(res.group("first")))
+            self.send_header("Content-Length", str((int(res["last"])+1 if res["last"] else fs[6]) - int(res["first"])))
         else:
             self.send_response(HTTPStatus.OK)
             self.send_header("Accept-Ranges", "bytes")
@@ -136,10 +139,27 @@ def send_head(self):
 
 
 def copyfile(self, source, outputfile, start_byte=None, end_byte=None):
-    if start_byte:
-        source.seek(start_byte)
-    # if end_byte:
-    #     source.truncate(end_byte-start_byte)
-    #     outputfile.write(source.read(-1 if not end_byte else end_byte-start_byte))
-    # else:
-    shutil.copyfileobj(source, outputfile)
+    if os.name == 'nt':
+        if start_byte:
+            source.seek(start_byte)
+        cnt = end_byte - (start_byte or 0) if end_byte else 0
+        transmite_file(outputfile, source, cnt)
+    else: # posix
+        if start_byte or end_byte:
+            outputfile._sock.sendfile(source, start_byte, end_byte)
+        else:
+            outputfile._sock.sendfile(source)
+
+if os.name == 'nt':
+    import msvcrt, ctypes
+    from ctypes import wintypes
+    _tf = ctypes.windll.Mswsock.TransmitFile
+    _tf.argtypes = [wintypes.HANDLE, wintypes.HANDLE, wintypes.DWORD, wintypes.DWORD,
+                    wintypes.LPVOID, wintypes.LPVOID, wintypes.DWORD]
+    _tf.restype = wintypes.BOOL
+
+    def transmite_file(sock: socket.socket, file: io.BufferedReader, cnt):
+        status = _tf(sock.fileno(), msvcrt.get_osfhandle(file.fileno()), cnt, 0, None, None, 0x20)
+        if not status:
+            err = ctypes.GetLastError()
+            raise OSError(None, ctypes.FormatError(err), None, err)
