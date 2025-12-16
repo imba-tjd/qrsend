@@ -38,6 +38,6 @@ These has been fixed in my patch.
 2. I tried to use `source.truncate()`. But it turns out an `io.UnsupportedOperation`. The reason is that *truncate* will modify the actual file on disk, and mode 'r' protects that.
 3. `wfile._sock.sendfile()` is the perfect solution, except `_sock` isn't public.\
     According to https://github.com/python/cpython/blob/main/Lib/socketserver.py, wfile is a *file obj* determined by *wbufsize*. When it == 0, wfile is `_SocketWriter` (added in https://bugs.python.org/issue26721), otherwise it's created by `socket.makefile()`. I think HTTPServer is not likely to change wbufsize, so it's ok to use `_sock`.
-4. On windows, the sendfile isn't actually the zero-copy syscall. Windows has another API that needs to be adopted via https://github.com/python/cpython/pull/112337. I managed to invoke it via ctypes.
+4. On windows, the sendfile isn't actually the zero-copy syscall. Windows has another API that needs to be adopted via https://github.com/python/cpython/pull/112337. ~~I managed to invoke it via ctypes.~~ Accroding to [msdoc](https://learn.microsoft.com/en-us/windows/win32/api/mswsock/nf-mswsock-transmitfile#remarks), a single call to transmitfile fails on `cnt >= 2**-1` including setting it to 0, meaning that it can't transfer files larger than 2GB.
 
 In the future, https://github.com/python/cpython/pull/118949 is more likely to be merged.

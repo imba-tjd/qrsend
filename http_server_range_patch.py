@@ -139,7 +139,8 @@ def send_head(self: SimpleHTTPRequestHandler):
 
 
 def copyfile(self, source, outputfile, start_byte=None, end_byte=None):
-    if os.name == 'nt':
+    if False:
+    # if os.name == 'nt':
         if start_byte:
             source.seek(start_byte)
         cnt = end_byte - (start_byte or 0) if end_byte else 0
@@ -161,5 +162,4 @@ if os.name == 'nt':
     def transmite_file(sock: socket.socket, file: io.BufferedReader, cnt):
         status = _tf(sock.fileno(), msvcrt.get_osfhandle(file.fileno()), cnt, 0, None, None, 0x20)
         if not status:
-            err = ctypes.GetLastError()
-            raise OSError(None, ctypes.FormatError(err), None, err)
+            raise ctypes.WinError()
