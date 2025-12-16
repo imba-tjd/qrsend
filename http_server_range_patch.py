@@ -139,8 +139,7 @@ def send_head(self: SimpleHTTPRequestHandler):
 
 
 def copyfile(self, source, outputfile, start_byte=None, end_byte=None):
-    if False:
-    # if os.name == 'nt':
+    if os.name == 'nt' and os.fstat(source.fileno())[6] <= 2**31-2:
         if start_byte:
             source.seek(start_byte)
         cnt = end_byte - (start_byte or 0) if end_byte else 0
